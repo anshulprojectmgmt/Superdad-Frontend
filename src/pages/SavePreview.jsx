@@ -3,7 +3,6 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import heroImg from "../assets/magic_icon.svg";
 import useChildStore from "../store/childStore";
 import axios from "axios";
-const server_url = "https://is510t1jgd.execute-api.ap-south-1.amazonaws.com";
 const local_server_url = "http://localhost:3000";
 
 function SavePreview() {
@@ -25,7 +24,7 @@ function SavePreview() {
 
   const sendPreviewLink = async () => {
     try {
-      await axios.post(`${server_url}/api/photo/send_preview`, {
+      await axios.post(`${local_server_url}/api/photo/send_preview`, {
         email: formData.email,
         name: formData.name,
         req_id: request_id,
@@ -136,7 +135,10 @@ function SavePreview() {
               </p>
               <p className="text-gray-600 mb-6">
                 Meanwhile, you can{" "}
-                <Link to="/books" className="text-teal-600 underline font-medium">
+                <Link
+                  to="/books"
+                  className="text-teal-600 underline font-medium"
+                >
                   Explore Other Books
                 </Link>{" "}
                 we have.

@@ -1,9 +1,7 @@
-import { Link } from 'react-router-dom';
-import {useEffect} from 'react';
-import axios from 'axios';
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import axios from "axios";
 function BookSelection() {
-
-
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -12,16 +10,20 @@ function BookSelection() {
             Welcome to Storybook
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Create personalized storybooks that make your child the star of their own adventure!
+            Create personalized storybooks that make your child the star of
+            their own adventure!
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition duration-300">
             <div className="p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Create a Custom Book</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Create a Custom Book
+              </h2>
               <p className="text-gray-600 mb-6">
-                Make your child the hero of their own story with our personalized books.
+                Make your child the hero of their own story with our
+                personalized books.
               </p>
               <Link
                 to="/books"
@@ -34,7 +36,9 @@ function BookSelection() {
 
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition duration-300">
             <div className="p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">View Sample Books</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                View Sample Books
+              </h2>
               <p className="text-gray-600 mb-6">
                 Explore our collection of beautifully crafted children's books.
               </p>
@@ -49,11 +53,17 @@ function BookSelection() {
         </div>
 
         <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Choose Imagitime?</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">
+            Why Choose Imagitime?
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h4 className="text-xl font-semibold mb-2">Personalized Stories</h4>
-              <p className="text-gray-600">Every book is uniquely crafted for your child</p>
+              <h4 className="text-xl font-semibold mb-2">
+                Personalized Stories
+              </h4>
+              <p className="text-gray-600">
+                Every book is uniquely crafted for your child
+              </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-md">
               <h4 className="text-xl font-semibold mb-2">Quick Creation</h4>

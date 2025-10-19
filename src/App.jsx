@@ -1,13 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import BookSelection from './pages/BookSelection';
-import BooksList from './pages/BooksList';
-import ChildDetails from './pages/ChildDetails';
-import PhotoUpload from './pages/PhotoUpload';
-import Preview from './pages/Preview';
-import SavePreview from './pages/SavePreview';
-import Purchase from './pages/Purchase';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import BookSelection from "./pages/BookSelection";
+import BooksList from "./pages/BooksList";
+import ChildDetails from "./pages/ChildDetails";
+import PhotoUpload from "./pages/PhotoUpload";
+import Preview from "./pages/Preview";
+import SavePreview from "./pages/SavePreview";
+import Purchase from "./pages/Purchase";
+import SceneUploader from "./components/SceneUploader";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/preview" element={<Preview />} />
             <Route path="/save-preview" element={<SavePreview />} />
             <Route path="/purchase" element={<Purchase />} />
+            <Route path="/sceneUpload" element={<SceneUploader />} />
           </Routes>
         </main>
         <Footer />

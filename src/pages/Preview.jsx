@@ -1,33 +1,48 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
-import useChildStore from '../store/childStore';
-import axios from 'axios';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect, useCallback } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import useChildStore from "../store/childStore";
+import axios from "axios";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-const server_url = "https://is510t1jgd.execute-api.ap-south-1.amazonaws.com"
 const local_server_url = "http://localhost:3000";
-
+//    {
+//     "_id": "68eeba12baa2e6ef48150415",
+//     "req_id": "req_cihotfrsn",
+//     "job_id": "86bdfe2a-f751-4526-a69f-0a50c47d6fdf",
+//     "book_id": "68d191028bb1c74b7bbfe644",
+//     "page_number": 11,
+//     "status": "completed",
+//     "image_urls": [
+//         "https://kids-storybooks.s3.ap-south-1.amazonaws.com/ai_generated_images/ai_result_86bdfe2a-f751-4526-a69f-0a50c47d6fdf.jpg"
+//     ],
+//     "image_idx": 0,
+//     "created_at": "2025-10-14T21:01:06.981Z",
+//     "updated_at": "2025-10-14T21:04:46.829Z",
+//     "__v": 0,
+//     "scene": "Amaya rang the bell, and the eagle gifted her a bright ribbon",
+//     "next": true,
+//     "ok": true
+// }
 function Preview() {
   const [searchParams] = useSearchParams();
-  
+
   // Get all query parameters
-  const request_id = searchParams.get('request_id');
-  const book_id = searchParams.get('book_id');
-  const childName = searchParams.get('name') || useChildStore((state) => state.childName);
-  const gender = searchParams.get('gender');
-  const age = searchParams.get('age');
-  const birthMonth = searchParams.get('birthMonth');
-  const page_count = Number(searchParams.get('page_count')) || 0;
-  
-  
-  
+  const request_id = searchParams.get("request_id");
+  const book_id = searchParams.get("book_id");
+  const childName =
+    searchParams.get("name") || useChildStore((state) => state.childName);
+  const gender = searchParams.get("gender");
+  const age = searchParams.get("age");
+  const birthMonth = searchParams.get("birthMonth");
+  const page_count = Number(searchParams.get("page_count")) || 0;
+
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageData, setPageData] = useState([]);
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [hasNextPage, setHasNextPage] = useState(true);
   const [showSaveButton, setShowSaveButton] = useState(false);
   const [currentImageIndexes, setCurrentImageIndexes] = useState({});
@@ -35,48 +50,59 @@ function Preview() {
   const [allPagesLoaded, setAllPagesLoaded] = useState(false);
 
   // Calculate loading progress based on loaded pages
-  const loadingProgress = Math.min((pageData.filter(page => page).length / totalPages) * 100, 100);
+  const loadingProgress = Math.min(
+    (pageData.filter((page) => page).length / totalPages) * 100,
+    100
+  );
   // const first4PagesLoaded = pageData.filter(page => page).length >= 4;
-  const first4PagesLoaded =  Math.floor(page_count/4);
-
+  const first4PagesLoaded = Math.floor(page_count / 4);
+  //to show savebtton on scrolling more than 100 in y direction
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setShowSaveButton(scrollPosition > 100);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const pollUntilDone = async (req_id, job_id, page_number, book_id, maxRetries = 25, interval = 10000) => {
+  const pollUntilDone = async (
+    req_id,
+    job_id,
+    page_number,
+    book_id,
+    maxRetries = 25,
+    interval = 10000
+  ) => {
     let retries = 0;
-    
-    
+
     const poll = async () => {
       try {
-        const res = await axios.get(`${server_url}/api/photo/check_generation_status`, {
-          params: { req_id, job_id, page_number, book_id }
-        });
+        const res = await axios.get(
+          `${local_server_url}/api/photo/check_generation_status`,
+          {
+            params: { req_id, job_id, page_number, book_id },
+          }
+        );
 
         const data = res.data;
-        console.log("Polling response:", data);
-        if (data.status === 'completed' && data.image_urls) {
+        // console.log("Polling response:", data);
+        if (data.status === "completed" && data.image_urls) {
           return data;
         }
 
-        if(data.status == "failed") {
+        if (data.status == "failed") {
           throw new Error("Image generation failed");
         }
 
         if (retries < maxRetries) {
           retries++;
-          await new Promise(resolve => setTimeout(resolve, interval));
+          await new Promise((resolve) => setTimeout(resolve, interval));
           return await poll();
         } else {
           throw new Error("Polling timed out");
         }
-
       } catch (error) {
         console.error("Polling error:", error);
         return { error: true };
@@ -86,34 +112,46 @@ function Preview() {
     return await poll();
   };
 
-  const fetchPageData = useCallback(async (pageNumber, book_id) => {
-    try {
-      const response = await axios.get(`${server_url}/api/photo/get_generation_details`, {
-        params: {
-          req_id: request_id,
-          book_id,
-          page_number: pageNumber
-        },
-      });
+  const fetchPageData = useCallback(
+    async (pageNumber, book_id) => {
+      try {
+        const response = await axios.get(
+          `${local_server_url}/api/photo/get_generation_details`,
+          {
+            params: {
+              req_id: request_id,
+              book_id,
+              page_number: pageNumber,
+              childName,
+            },
+          }
+        );
 
-      const { job_id } = response.data;
-      console.log('Job ID:', job_id);
-      if (!job_id) {
-        throw new Error("No job_id found in response");
+        const { job_id } = response.data;
+        // console.log("Job ID:", job_id);
+        if (!job_id) {
+          throw new Error("No job_id found in response");
+        }
+
+        const result = await pollUntilDone(
+          request_id,
+          job_id,
+          pageNumber,
+          book_id
+        );
+        if (result.error) {
+          throw new Error(
+            "Error during polling for image generation maybe retry limit reached"
+          );
+        }
+        return { ...result, pageNumber };
+      } catch (error) {
+        console.error("Error fetching page data:", error);
+        return null;
       }
-      
-      const result = await pollUntilDone(request_id, job_id, pageNumber, book_id);
-      if(result.error) {
-        throw new Error("Error during polling for image generation maybe retry limit reached");
-
-      }
-      return { ...result, pageNumber }; 
-
-    } catch (error) {
-      console.error('Error fetching page data:', error);
-      return null;
-    }
-  }, [request_id]);
+    },
+    [request_id, childName]
+  );
 
   useEffect(() => {
     let progressInterval;
@@ -123,31 +161,31 @@ function Preview() {
       setLoadingMessage(`Loading page ${currentPage}`);
 
       const pageResult = await fetchPageData(currentPage, book_id);
-      
+      // console.log(pageResult);
       if (!isMounted) return;
 
       if (pageResult) {
-        setPageData(prev => {
+        setPageData((prev) => {
           const newPages = [...prev];
           newPages[pageResult.pageNumber - 1] = pageResult;
           return newPages;
         });
-        
+
         // Initialize current image index for this page
-        setCurrentImageIndexes(prev => ({
+        setCurrentImageIndexes((prev) => ({
           ...prev,
-          [pageResult.pageNumber - 1]: pageResult.image_idx || 0
+          [pageResult.pageNumber - 1]: pageResult.image_idx || 0,
         }));
-        
+
         if (progressInterval) {
           clearInterval(progressInterval);
         }
-        
+
         setIsLoading(false);
         setHasNextPage(pageResult.next || false);
 
         if (pageResult.next) {
-          setCurrentPage(prev => prev + 1);
+          setCurrentPage((prev) => prev + 1);
           setIsLoading(true);
         } else {
           // All pages loaded
@@ -166,40 +204,42 @@ function Preview() {
     };
   }, [currentPage, fetchPageData, book_id]);
 
-  const handleImageNavigation = useCallback((pageIndex, direction) => {
-    const page = pageData[pageIndex];
-    if (!page || !page.image_urls) return;
+  const handleImageNavigation = useCallback(
+    (pageIndex, direction) => {
+      const page = pageData[pageIndex];
+      if (!page || !page.image_urls) return;
 
-    const currentIndex = currentImageIndexes[pageIndex] || 0;
-    const totalImages = page.image_urls.length;
-    
-    let newIndex;
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % totalImages;
-    } else {
-      newIndex = currentIndex === 0 ? totalImages - 1 : currentIndex - 1;
-    }
+      const currentIndex = currentImageIndexes[pageIndex] || 0;
+      const totalImages = page.image_urls.length;
 
-    setCurrentImageIndexes(prev => ({
-      ...prev,
-      [pageIndex]: newIndex
-    }));
+      let newIndex;
+      if (direction === "next") {
+        newIndex = (currentIndex + 1) % totalImages;
+      } else {
+        newIndex = currentIndex === 0 ? totalImages - 1 : currentIndex - 1;
+      }
 
-    updatePageImage(page.req_id, page.job_id, newIndex);
+      setCurrentImageIndexes((prev) => ({
+        ...prev,
+        [pageIndex]: newIndex,
+      }));
 
-  }, [pageData, currentImageIndexes]);
+      updatePageImage(page.req_id, page.job_id, newIndex);
+    },
+    [pageData, currentImageIndexes]
+  );
 
   const updatePageImage = async (req_id, job_id, image_id) => {
     try {
-      await axios.post(`${server_url}/api/photo/update_image`, {
+      await axios.post(`${local_server_url}/api/photo/update_image`, {
         req_id,
         job_id,
-        image_id
+        image_id,
       });
     } catch (error) {
-      console.error('Error updating page image:', error);
+      console.error("Error updating page image:", error);
     }
-  }
+  };
 
   // Handle touch events for swipe functionality
   const handleTouchStart = useCallback((e, pageIndex) => {
@@ -208,24 +248,27 @@ function Preview() {
     e.currentTarget.dataset.startY = touch.clientY;
   }, []);
 
-  const handleTouchEnd = useCallback((e, pageIndex) => {
-    const startX = parseFloat(e.currentTarget.dataset.startX);
-    const startY = parseFloat(e.currentTarget.dataset.startY);
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
-    
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-    
-    // Only trigger swipe if horizontal movement is greater than vertical
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-      if (deltaX > 0) {
-        handleImageNavigation(pageIndex, 'prev');
-      } else {
-        handleImageNavigation(pageIndex, 'next');
+  const handleTouchEnd = useCallback(
+    (e, pageIndex) => {
+      const startX = parseFloat(e.currentTarget.dataset.startX);
+      const startY = parseFloat(e.currentTarget.dataset.startY);
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+
+      // Only trigger swipe if horizontal movement is greater than vertical
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+          handleImageNavigation(pageIndex, "prev");
+        } else {
+          handleImageNavigation(pageIndex, "next");
+        }
       }
-    }
-  }, [handleImageNavigation]);
+    },
+    [handleImageNavigation]
+  );
 
   const handleSavePreview = () => {
     // Create query params with all details for save preview page
@@ -233,11 +276,11 @@ function Preview() {
       request_id: request_id,
       book_id: book_id,
       name: childName,
-      gender: gender || '',
-      age: age || '',
-      birthMonth: birthMonth || ''
+      gender: gender || "",
+      age: age || "",
+      birthMonth: birthMonth || "",
     });
-    
+
     return `/save-preview?${saveParams.toString()}`;
   };
 
@@ -246,11 +289,11 @@ function Preview() {
     const uploadParams = new URLSearchParams({
       book_id: book_id,
       name: childName,
-      gender: gender || '',
-      age: age || '',
-      birthMonth: birthMonth || ''
+      gender: gender || "",
+      age: age || "",
+      birthMonth: birthMonth || "",
     });
-    
+
     return `/upload?${uploadParams.toString()}`;
   };
 
@@ -260,50 +303,51 @@ function Preview() {
       request_id: request_id,
       book_id: book_id,
       name: childName,
-      gender: gender || '',
-      age: age || '',
-      birthMonth: birthMonth || '',
-      notify: true // Indicate this is for email preview
+      gender: gender || "",
+      age: age || "",
+      birthMonth: birthMonth || "",
+      notify: true, // Indicate this is for email preview
     });
-    
+
     return `/save-preview?${saveParams.toString()}`;
   };
 
   // Show loading state with progress bar until pageDate is greater than first4PagesLoaded
-  if (pageData.length<=first4PagesLoaded) {
+  if (pageData.length <= first4PagesLoaded) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <div className="flex-grow flex items-center justify-center px-4">
           <div className="text-center max-w-md mx-auto">
             <div className="w-32 h-32 mx-auto mb-8">
-              <CircularProgressbar 
-                value={loadingProgress} 
+              <CircularProgressbar
+                value={loadingProgress}
                 text={`${Math.round(loadingProgress)}%`}
                 styles={{
-                  path: { 
-                    stroke: '#22c55e',
+                  path: {
+                    stroke: "#22c55e",
                     strokeWidth: 8,
-                    transition: 'stroke-dashoffset 0.5s ease 0s'
+                    transition: "stroke-dashoffset 0.5s ease 0s",
                   },
-                  text: { 
-                    fill: '#6b7280', 
-                    fontSize: '16px',
-                    fontWeight: 'bold'
+                  text: {
+                    fill: "#6b7280",
+                    fontSize: "16px",
+                    fontWeight: "bold",
                   },
                   trail: {
-                    stroke: '#e5e7eb',
-                    strokeWidth: 8
-                  }
+                    stroke: "#e5e7eb",
+                    strokeWidth: 8,
+                  },
                 }}
               />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-700 mb-8">
               Creating {childName}'s Book...
             </h2>
-            
+
             <div className="bg-blue-900 rounded-xl p-6 md:p-8 text-white mb-8">
               <p className="italic text-lg md:text-xl mb-4">
-                "Amazing, unique product - customer service OUTSTANDING - will now be my go to gift."
+                "Amazing, unique product - customer service OUTSTANDING - will
+                now be my go to gift."
               </p>
               <p className="font-semibold text-orange-400 text-lg">Ellie</p>
             </div>
@@ -349,55 +393,69 @@ function Preview() {
 
         <div className="space-y-12">
           <div className="text-center space-y-2 font-medium text-gray-600">
-            <p className="text-xl md:text-2xl">↓ Pages get shown one below the other</p>
-            <p className="text-xl md:text-2xl">🔄 Swipe left/right to see different images</p>
+            <p className="text-xl md:text-2xl">
+              ↓ Pages get shown one below the other
+            </p>
+            <p className="text-xl md:text-2xl">
+              🔄 Swipe left/right to see different images
+            </p>
           </div>
 
           {pageData.map((page, pageIndex) => {
             if (!page) return null;
-            
+
             const images = page.image_urls || [];
             const currentImageIndex = currentImageIndexes[pageIndex] || 0;
 
             return (
-              <div 
+              <div
                 key={pageIndex}
                 className="bg-white rounded-xl shadow-lg p-4 sm:p-6 transform transition-all duration-500 ease-in-out"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-blue-900">Page {pageIndex + 1}</h2>
+                  <h2 className="text-xl font-bold text-blue-900">
+                    Page {pageIndex + 1}
+                  </h2>
                   {images.length > 1 && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span>{currentImageIndex + 1} of {images.length}</span>
+                      <span>
+                        {currentImageIndex + 1} of {images.length}
+                      </span>
                     </div>
                   )}
                 </div>
-                
+
                 <div className="relative w-full rounded-lg overflow-hidden group">
-                  <div 
+                  <div
                     className="relative"
                     onTouchStart={(e) => handleTouchStart(e, pageIndex)}
                     onTouchEnd={(e) => handleTouchEnd(e, pageIndex)}
                   >
-                    <img 
+                    <img
                       src={images[currentImageIndex]}
-                      alt={`Page ${pageIndex + 1} - Image ${currentImageIndex + 1}`}
-                      className="w-full aspect-[4/3] object-cover transition-opacity duration-300"
+                      alt={`Page ${pageIndex + 1} - Image ${
+                        currentImageIndex + 1
+                      }`}
+                      className="w-full aspect-[4/3] object-contain transition-opacity duration-300"
                     />
-                    
+
                     {/* Navigation arrows - only show if there are multiple images */}
                     {images.length > 1 && (
                       <>
                         <button
-                          onClick={() => handleImageNavigation(pageIndex, 'prev')}
+                          onClick={() =>
+                            handleImageNavigation(pageIndex, "prev")
+                          }
                           className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full transition-opacity duration-300 hover:bg-opacity-70"
                           aria-label="Previous image"
                         >
                           <ChevronLeftIcon className="h-5 w-5" />
                         </button>
-                        
+
                         <button
-                          onClick={() => handleImageNavigation(pageIndex, 'next')}
+                          onClick={() =>
+                            handleImageNavigation(pageIndex, "next")
+                          }
                           className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full transition-opacity duration-300 hover:bg-opacity-70"
                           aria-label="Next image"
                         >
@@ -413,14 +471,16 @@ function Preview() {
                       {images.map((_, imageIndex) => (
                         <button
                           key={imageIndex}
-                          onClick={() => setCurrentImageIndexes(prev => ({
-                            ...prev,
-                            [pageIndex]: imageIndex
-                          }))}
+                          onClick={() =>
+                            setCurrentImageIndexes((prev) => ({
+                              ...prev,
+                              [pageIndex]: imageIndex,
+                            }))
+                          }
                           className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                            imageIndex === currentImageIndex 
-                              ? 'bg-white scale-125' 
-                              : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                            imageIndex === currentImageIndex
+                              ? "bg-white scale-125"
+                              : "bg-white bg-opacity-50 hover:bg-opacity-75"
                           }`}
                           aria-label={`Go to image ${imageIndex + 1}`}
                         />
@@ -447,7 +507,9 @@ function Preview() {
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
               <p className="text-lg text-gray-600">{loadingMessage}</p>
-              {hasNextPage && <p className="text-sm text-gray-500">Next page coming up...</p>}
+              {hasNextPage && (
+                <p className="text-sm text-gray-500">Next page coming up...</p>
+              )}
             </div>
           )}
         </div>
