@@ -41,7 +41,7 @@ function SavePreview() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    sendPreviewLink();
+    await sendPreviewLink();
     if (notify) {
       setShowThankYou(true);
     } else {
