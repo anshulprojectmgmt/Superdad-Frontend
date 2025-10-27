@@ -32,8 +32,12 @@ function Preview() {
   // Get all query parameters
   const request_id = searchParams.get("request_id");
   const book_id = searchParams.get("book_id");
-  const childName =
-    searchParams.get("name") || useChildStore((state) => state.childName);
+  // const childName =
+  //   searchParams.get("name") || useChildStore((state) => state.childName);
+  const rawName = searchParams.get("name");
+  const storedChildName = useChildStore((state) => state.childName);
+  const childName = rawName && rawName !== "{kid}" ? rawName : storedChildName;
+
   const gender = searchParams.get("gender");
   const age = searchParams.get("age");
   const birthMonth = searchParams.get("birthMonth");
@@ -47,14 +51,22 @@ function Preview() {
   const [hasNextPage, setHasNextPage] = useState(true);
   const [showSaveButton, setShowSaveButton] = useState(false);
   const [currentImageIndexes, setCurrentImageIndexes] = useState({});
-  const [totalPages, setTotalPages] = useState(page_count); // Assuming 8 total pages
+  // const [totalPages, setTotalPages] = useState(page_count); // Assuming 8 total pages
+  const [totalPages, setTotalPages] = useState(page_count > 0 ? page_count : 1);
+
   const [allPagesLoaded, setAllPagesLoaded] = useState(false);
 
   // Calculate loading progress based on loaded pages
-  const loadingProgress = Math.min(
-    (pageData.filter((page) => page).length / totalPages) * 100,
-    100
-  );
+  // const loadingProgress = Math.min(
+  //   (pageData.filter((page) => page).length / totalPages) * 100,
+  //   100
+  // );
+
+  // Calculate loading progress safely
+  const loadedPages = pageData.filter((page) => page).length;
+  const safeTotalPages = totalPages > 0 ? totalPages : 1; // avoid division by 0
+  const loadingProgress = Math.min((loadedPages / safeTotalPages) * 100, 100);
+
   // const first4PagesLoaded = pageData.filter(page => page).length >= 4;
   const first4PagesLoaded = Math.floor(page_count / 4);
   //to show savebtton on scrolling more than 100 in y direction
@@ -320,9 +332,31 @@ function Preview() {
         <div className="flex-grow flex items-center justify-center px-4">
           <div className="text-center max-w-md mx-auto">
             <div className="w-32 h-32 mx-auto mb-8">
-              <CircularProgressbar
+              {/* <CircularProgressbar
                 value={loadingProgress}
                 text={`${Math.round(loadingProgress)}%`}
+                styles={{
+                  path: {
+                    stroke: "#22c55e",
+                    strokeWidth: 8,
+                    transition: "stroke-dashoffset 0.5s ease 0s",
+                  },
+                  text: {
+                    fill: "#6b7280",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                  },
+                  trail: {
+                    stroke: "#e5e7eb",
+                    strokeWidth: 8,
+                  },
+                }}
+              /> */}
+              <CircularProgressbar
+                value={isNaN(loadingProgress) ? 0 : loadingProgress}
+                text={`${
+                  isNaN(loadingProgress) ? 0 : Math.round(loadingProgress)
+                }%`}
                 styles={{
                   path: {
                     stroke: "#22c55e",
@@ -490,8 +524,17 @@ function Preview() {
                   )}
                 </div>
 
-                <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
+                {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
                   {page.scene || `Page ${pageIndex + 1} content`}
+                </p> */}
+
+                {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
+                  {page.scene?.replace(/{kid}/gi, childName) ||
+                    `Page ${pageIndex + 1} content`}
+                </p> */}
+                <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
+                  {page.scene?.replace(/{kid}/gi, childName || "your child") ||
+                    `Page ${pageIndex + 1} content`}
                 </p>
 
                 {/* Swipe instruction for mobile */}
