@@ -6,8 +6,8 @@ import useChildStore from "../store/childStore";
 import axios from "axios";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-// const local_server_url = "http://localhost:3000";
-const local_server_url = "https://storybook-render-backend.onrender.com";
+const local_server_url = "http://localhost:3000";
+// const local_server_url = "https://storybook-render-backend.onrender.com";
 //    {
 //     "_id": "68eeba12baa2e6ef48150415",
 //     "req_id": "req_cihotfrsn",
@@ -30,6 +30,7 @@ function Preview() {
   const [searchParams] = useSearchParams();
 
   // Get all query parameters
+
   const request_id = searchParams.get("request_id");
   const book_id = searchParams.get("book_id");
   // const childName =
@@ -44,6 +45,8 @@ function Preview() {
   const page_count = Number(searchParams.get("page_count")) || 0;
 
   const [progress, setProgress] = useState(0);
+  const [finalBook, setFinalBook] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageData, setPageData] = useState([]);
@@ -69,6 +72,61 @@ function Preview() {
 
   // const first4PagesLoaded = pageData.filter(page => page).length >= 4;
   const first4PagesLoaded = Math.floor(page_count / 4);
+
+  // new code to print the book in correct order after all the pages and covers are generated
+  useEffect(() => {
+    // Detect if this is an email preview (when ?email=true)
+    const isEmailPreview = searchParams.get("email") === "true";
+
+    // In live generation, wait for allPagesLoaded
+    if (!isEmailPreview && !allPagesLoaded) return;
+
+    let intervalId;
+
+    const fetchFinalBook = async () => {
+      try {
+        const res = await axios.get(
+          `${local_server_url}/api/photo/get_all_pages`,
+          {
+            params: { req_id: request_id },
+          }
+        );
+
+        const { front_cover_url, back_cover_url, pages } = res.data;
+
+        // Keep polling until both covers exist (for live generation)
+        if (!front_cover_url || !back_cover_url) {
+          if (!isEmailPreview) {
+            console.log("Covers not ready yet... retrying");
+          }
+          return; // Skip until next interval
+        }
+
+        // ✅ Maintain order: Front → Pages → Back
+        const ordered = [front_cover_url, ...pages, back_cover_url].filter(
+          Boolean
+        );
+        setFinalBook(ordered);
+
+        // Stop polling when book is complete
+        clearInterval(intervalId);
+      } catch (err) {
+        console.error("Error fetching final book data:", err);
+      }
+    };
+
+    // 🟢 For live generation: poll until ready
+    // 🟢 For email preview: fetch once immediately
+    if (isEmailPreview) {
+      fetchFinalBook();
+    } else {
+      intervalId = setInterval(fetchFinalBook, 3000);
+      fetchFinalBook(); // also call immediately once
+    }
+
+    return () => clearInterval(intervalId);
+  }, [allPagesLoaded, request_id, searchParams]);
+
   //to show savebtton on scrolling more than 100 in y direction
   useEffect(() => {
     const handleScroll = () => {
@@ -435,117 +493,142 @@ function Preview() {
               🔄 Swipe left/right to see different images
             </p>
           </div>
-
-          {pageData.map((page, pageIndex) => {
-            if (!page) return null;
-
-            const images = page.image_urls || [];
-            const currentImageIndex = currentImageIndexes[pageIndex] || 0;
-
-            return (
-              <div
-                key={pageIndex}
-                className="bg-white rounded-xl shadow-lg p-4 sm:p-6 transform transition-all duration-500 ease-in-out"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-blue-900">
-                    Page {pageIndex + 1}
-                  </h2>
-                  {images.length > 1 && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span>
-                        {currentImageIndex + 1} of {images.length}
-                      </span>
-                    </div>
-                  )}
+          {finalBook
+            ? finalBook.map((imgUrl, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-lg p-4 sm:p-6 transform transition-all duration-500 ease-in-out"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-blue-900">
+                      {index === 0
+                        ? "Front Cover"
+                        : index === finalBook.length - 1
+                        ? "Back Cover"
+                        : `Page ${index}`}{" "}
+                    </h2>
+                  </div>
+                  <img
+                    src={imgUrl}
+                    alt={`Page ${index}`}
+                    className="w-full aspect-[4/3] object-contain"
+                  />
                 </div>
+              ))
+            : pageData.map((page, pageIndex) => {
+                if (!page) return null;
 
-                <div className="relative w-full rounded-lg overflow-hidden group">
+                const images = page.image_urls || [];
+                const currentImageIndex = currentImageIndexes[pageIndex] || 0;
+
+                return (
                   <div
-                    className="relative"
-                    onTouchStart={(e) => handleTouchStart(e, pageIndex)}
-                    onTouchEnd={(e) => handleTouchEnd(e, pageIndex)}
+                    key={pageIndex}
+                    className="bg-white rounded-xl shadow-lg p-4 sm:p-6 transform transition-all duration-500 ease-in-out"
                   >
-                    <img
-                      src={images[currentImageIndex]}
-                      alt={`Page ${pageIndex + 1} - Image ${
-                        currentImageIndex + 1
-                      }`}
-                      className="w-full aspect-[4/3] object-contain transition-opacity duration-300"
-                    />
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-bold text-blue-900">
+                        Page {pageIndex + 1}
+                      </h2>
+                      {images.length > 1 && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <span>
+                            {currentImageIndex + 1} of {images.length}
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Navigation arrows - only show if there are multiple images */}
+                    <div className="relative w-full rounded-lg overflow-hidden group">
+                      <div
+                        className="relative"
+                        onTouchStart={(e) => handleTouchStart(e, pageIndex)}
+                        onTouchEnd={(e) => handleTouchEnd(e, pageIndex)}
+                      >
+                        <img
+                          src={images[currentImageIndex]}
+                          alt={`Page ${pageIndex + 1} - Image ${
+                            currentImageIndex + 1
+                          }`}
+                          className="w-full aspect-[4/3] object-contain transition-opacity duration-300"
+                        />
+
+                        {/* Navigation arrows - only show if there are multiple images */}
+                        {images.length > 1 && (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleImageNavigation(pageIndex, "prev")
+                              }
+                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full transition-opacity duration-300 hover:bg-opacity-70"
+                              aria-label="Previous image"
+                            >
+                              <ChevronLeftIcon className="h-5 w-5" />
+                            </button>
+
+                            <button
+                              onClick={() =>
+                                handleImageNavigation(pageIndex, "next")
+                              }
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full transition-opacity duration-300 hover:bg-opacity-70"
+                              aria-label="Next image"
+                            >
+                              <ChevronRightIcon className="h-5 w-5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Image indicators - only show if there are multiple images */}
+                      {images.length > 1 && (
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                          {images.map((_, imageIndex) => (
+                            <button
+                              key={imageIndex}
+                              onClick={() =>
+                                setCurrentImageIndexes((prev) => ({
+                                  ...prev,
+                                  [pageIndex]: imageIndex,
+                                }))
+                              }
+                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                imageIndex === currentImageIndex
+                                  ? "bg-white scale-125"
+                                  : "bg-white bg-opacity-50 hover:bg-opacity-75"
+                              }`}
+                              aria-label={`Go to image ${imageIndex + 1}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
+           {page.scene || `Page ${pageIndex + 1} content`}
+         </p> */}
+
+                    {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
+           {page.scene?.replace(/{kid}/gi, childName) ||
+             `Page ${pageIndex + 1} content`}
+         </p> */}
+                    <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
+                      {page.scene?.replace(
+                        /{kid}/gi,
+                        childName || "your child"
+                      ) || `Page ${pageIndex + 1} content`}
+                    </p>
+
+                    {/* Swipe instruction for mobile */}
                     {images.length > 1 && (
-                      <>
-                        <button
-                          onClick={() =>
-                            handleImageNavigation(pageIndex, "prev")
-                          }
-                          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full transition-opacity duration-300 hover:bg-opacity-70"
-                          aria-label="Previous image"
-                        >
-                          <ChevronLeftIcon className="h-5 w-5" />
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            handleImageNavigation(pageIndex, "next")
-                          }
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full transition-opacity duration-300 hover:bg-opacity-70"
-                          aria-label="Next image"
-                        >
-                          <ChevronRightIcon className="h-5 w-5" />
-                        </button>
-                      </>
+                      <p className="mt-2 text-center text-sm text-gray-500 md:hidden">
+                        Swipe left or right to see more images
+                      </p>
                     )}
                   </div>
+                );
+              })}
 
-                  {/* Image indicators - only show if there are multiple images */}
-                  {images.length > 1 && (
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                      {images.map((_, imageIndex) => (
-                        <button
-                          key={imageIndex}
-                          onClick={() =>
-                            setCurrentImageIndexes((prev) => ({
-                              ...prev,
-                              [pageIndex]: imageIndex,
-                            }))
-                          }
-                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                            imageIndex === currentImageIndex
-                              ? "bg-white scale-125"
-                              : "bg-white bg-opacity-50 hover:bg-opacity-75"
-                          }`}
-                          aria-label={`Go to image ${imageIndex + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
-                  {page.scene || `Page ${pageIndex + 1} content`}
-                </p> */}
-
-                {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
-                  {page.scene?.replace(/{kid}/gi, childName) ||
-                    `Page ${pageIndex + 1} content`}
-                </p> */}
-                <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
-                  {page.scene?.replace(/{kid}/gi, childName || "your child") ||
-                    `Page ${pageIndex + 1} content`}
-                </p>
-
-                {/* Swipe instruction for mobile */}
-                {images.length > 1 && (
-                  <p className="mt-2 text-center text-sm text-gray-500 md:hidden">
-                    Swipe left or right to see more images
-                  </p>
-                )}
-              </div>
-            );
-          })}
+          {}
 
           {isLoading && currentPage > 1 && (
             <div className="text-center py-8">

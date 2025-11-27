@@ -23,6 +23,10 @@ function BookCard({ book }) {
     navigate(
       `/details?book_id=${bookId}&page_count=${book.page_count}&min_photos=${book.min_required_photos}`
     );
+    // this route to enable when to upload a whole scene document to s3 and to db
+    // navigate(
+    //   `/sceneUpload?book_id=${bookId}&page_count=${book.page_count}&min_photos=${book.min_required_photos}`
+    // );
   };
   // {
   //     "_id": "6818cab3bfb946189a94960c",

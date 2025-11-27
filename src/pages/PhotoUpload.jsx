@@ -9,8 +9,8 @@ import {
   BookOpenIcon,
 } from "@heroicons/react/24/outline";
 import axios from "axios";
-// const local_server_url = "http://localhost:3000";
-const local_server_url = "https://storybook-render-backend.onrender.com";
+const local_server_url = "http://localhost:3000";
+// const local_server_url = "https://storybook-render-backend.onrender.com";
 
 function PhotoUpload() {
   const navigate = useNavigate();
