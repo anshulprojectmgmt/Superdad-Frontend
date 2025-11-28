@@ -6,8 +6,8 @@ import useChildStore from "../store/childStore";
 import axios from "axios";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-const local_server_url = "http://localhost:3000";
-// const local_server_url = "https://storybook-render-backend.onrender.com";
+// const local_server_url = "http://localhost:3000";
+const local_server_url = "https://storybook-render-backend.onrender.com";
 //    {
 //     "_id": "68eeba12baa2e6ef48150415",
 //     "req_id": "req_cihotfrsn",

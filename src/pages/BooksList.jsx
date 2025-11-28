@@ -48,8 +48,8 @@ const books = [
     companion: "teddy",
   },
 ];
-const server_url = "http://127.0.0.1:3000";
-// const server_url = "https://storybook-render-backend.onrender.com";
+// const server_url = "http://127.0.0.1:3000";
+const server_url = "https://storybook-render-backend.onrender.com";
 function BooksList() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
