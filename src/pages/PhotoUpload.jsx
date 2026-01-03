@@ -134,7 +134,7 @@ function PhotoUpload() {
           Upload 2 to 4 photos of {childName}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-blue-50 rounded-xl p-6">
             <h3 className="font-semibold mb-4 text-gray-800">
               Photo Guidelines
@@ -170,6 +170,49 @@ function PhotoUpload() {
                   : "Drop your photos here"}
               </p>
               <p className="text-sm text-gray-500">or click to select files</p>
+              <p className="text-xs text-gray-400">
+                Minimum {Number(min_photos)} photos required
+              </p>
+            </div>
+          </div>
+        </div> */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* SINGLE GUIDELINE IMAGE */}
+          <div className="bg-blue-50 rounded-xl p-6 flex flex-col">
+            <h3 className="font-semibold mb-4 text-gray-800">
+              Photo Guidelines
+            </h3>
+
+            <div className="relative w-full overflow-hidden rounded-lg border border-blue-200 bg-white">
+              <img
+                src="/guidelines/instruction.jpg"
+                alt="Photo upload guidelines"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          </div>
+
+          {/* UPLOAD AREA (UNCHANGED) */}
+          <div
+            {...getRootProps()}
+            className={`border-3 border-dashed border-blue-200 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 transition duration-300 relative
+      bg-[radial-gradient(#e0e7ff_1px,transparent_1px)] [background-size:16px_16px]
+      ${isDragActive ? "border-blue-400 bg-blue-50" : ""}
+    `}
+          >
+            <input {...getInputProps()} />
+
+            <div className="space-y-4">
+              <PhotoIcon className="h-12 w-12 mx-auto text-blue-400" />
+
+              <p className="text-lg font-medium text-gray-700">
+                {isDragActive
+                  ? "Drop your photos here"
+                  : "Drop your photos here"}
+              </p>
+
+              <p className="text-sm text-gray-500">or click to select files</p>
+
               <p className="text-xs text-gray-400">
                 Minimum {Number(min_photos)} photos required
               </p>

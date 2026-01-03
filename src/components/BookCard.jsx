@@ -60,15 +60,24 @@ function BookCard({ book }) {
           isFlipping ? "animate-flip" : ""
         }`}
       >
-        {/* {images.map((image, index) => (
-          <img
-            key={index}
-            src={image}
-            alt={`${book.title} ${index + 1}`}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 backface-hidden
-              ${currentImageIndex === index ? 'opacity-100 rotate-y-0' : 'opacity-0 rotate-y-180'}`}
-          />
-        ))} */}
+        {/* GENDER BADGE */}
+        <div
+          className={`absolute top-4 left-4 z-10 px-4 py-1 rounded-full text-sm md:text-base font-bold
+    ${
+      book.gender === "boy"
+        ? "bg-blue-500 text-white"
+        : book.gender === "girl"
+        ? "bg-pink-500 text-white"
+        : "bg-yellow-400 text-blue-900"
+    }
+  `}
+        >
+          {book.gender === "boy"
+            ? "For Boys"
+            : book.gender === "girl"
+            ? "For Girls"
+            : "Unisex"}
+        </div>
 
         <img
           src={book.cover_photo}
