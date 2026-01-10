@@ -390,26 +390,6 @@ function Preview() {
         <div className="flex-grow flex items-center justify-center px-4">
           <div className="text-center max-w-md mx-auto">
             <div className="w-32 h-32 mx-auto mb-8">
-              {/* <CircularProgressbar
-                value={loadingProgress}
-                text={`${Math.round(loadingProgress)}%`}
-                styles={{
-                  path: {
-                    stroke: "#22c55e",
-                    strokeWidth: 8,
-                    transition: "stroke-dashoffset 0.5s ease 0s",
-                  },
-                  text: {
-                    fill: "#6b7280",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                  },
-                  trail: {
-                    stroke: "#e5e7eb",
-                    strokeWidth: 8,
-                  },
-                }}
-              /> */}
               <CircularProgressbar
                 value={isNaN(loadingProgress) ? 0 : loadingProgress}
                 text={`${
@@ -434,7 +414,7 @@ function Preview() {
               />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-700 mb-8">
-              Creating {childName}'s Book...
+              Creating {childName}&apos;s Book...
             </h2>
 
             <div className="bg-blue-900 rounded-xl p-6 md:p-8 text-white mb-8">
@@ -447,7 +427,7 @@ function Preview() {
 
             <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200">
               <h3 className="text-xl md:text-2xl font-bold text-blue-900 mb-4">
-                Don't have time to wait?
+                Don&apos;t have time to wait?
               </h3>
               <Link
                 to={handleEmailPreview()}
@@ -465,23 +445,9 @@ function Preview() {
   // Show pages after first 4 are loaded
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <div className="sticky top-0 bg-gray-50 z-50 shadow-md">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">Want to try a different photo?</p>
-            <Link 
-              to={handleUploadAnother()}
-              className="bg-secondary text-white px-6 py-2 rounded-full text-sm hover:bg-blue-600 transition duration-300"
-            >
-              Upload Another Photo
-            </Link>
-          </div>
-        </div>
-      </div> */}
-
       <div className="max-w-2xl mx-auto px-4 pt-6 pb-24">
         <h1 className="text-4xl md:text-5xl font-bold text-center text-blue-900 mb-6">
-          {childName}'s Book Preview
+          {childName}&apos;s Book Preview
         </h1>
 
         <div className="space-y-12">
@@ -603,14 +569,6 @@ function Preview() {
                       )}
                     </div>
 
-                    {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
-           {page.scene || `Page ${pageIndex + 1} content`}
-         </p> */}
-
-                    {/* <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
-           {page.scene?.replace(/{kid}/gi, childName) ||
-             `Page ${pageIndex + 1} content`}
-         </p> */}
                     <p className="mt-6 text-gray-800 text-lg font-medium text-center px-4">
                       {page.scene?.replace(
                         /{kid}/gi,
@@ -649,7 +607,7 @@ function Preview() {
             // Show "Email me the preview instead" while pages are still loading
             <div className="bg-white rounded-xl p-4 border border-gray-200">
               <h3 className="text-lg font-bold text-blue-900 mb-3 text-center">
-                Don't have time to wait?
+                Don&apos;t have time to wait?
               </h3>
               <Link
                 to={handleEmailPreview()}

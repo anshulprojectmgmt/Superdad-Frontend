@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import BookSelection from "./pages/BookSelection";
 import BooksList from "./pages/BooksList";
 import ChildDetails from "./pages/ChildDetails";
 import PhotoUpload from "./pages/PhotoUpload";
@@ -9,15 +8,17 @@ import Preview from "./pages/Preview";
 import SavePreview from "./pages/SavePreview";
 import Purchase from "./pages/Purchase";
 import SceneUploader from "./components/SceneUploader";
+import Frontpage from "./pages/frontpage";
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
-        <main className="flex-grow">
+        <main className="flex-grow ">
           <Routes>
-            <Route path="/" element={<BookSelection />} />
+            {/* <Route path="/" element={<BookSelection />} /> */}
+            <Route path="/" element={<Frontpage />} />
             <Route path="/books" element={<BooksList />} />
             <Route path="/details" element={<ChildDetails />} />
             <Route path="/upload" element={<PhotoUpload />} />

@@ -53,3 +53,90 @@ body {
     transform: rotateY(360deg);
   }
 }
+
+/* ✨ Sparkle particles */
+.sparkle {
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(125, 211, 252, 0.9) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation-name: sparkle-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sparkle-float {
+  0% {
+    transform: translateY(0) scale(0.4);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-50px) scale(1.2);
+    opacity: 0;
+  }
+}
+/* Animated gradient background */
+.animated-gradient-bg {
+  background-size: 300% 300%;
+}
+
+.animate-gradient {
+  animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Sparkles */
+.bg-sparkle {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #fff, #93c5fd, transparent);
+  opacity: 0;
+  animation: sparkleFloat 6s infinite ease-in-out;
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: translateY(0) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-60px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Hover glow synced with bg */
+.group:hover .hover-glow {
+  box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+}
