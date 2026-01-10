@@ -8,7 +8,7 @@ import Preview from "./pages/Preview";
 import SavePreview from "./pages/SavePreview";
 import Purchase from "./pages/Purchase";
 import SceneUploader from "./components/SceneUploader";
-import Frontpage from "./pages/frontpage";
+import Frontpage from "./pages/Frontpage";
 
 function App() {
   return (
