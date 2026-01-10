@@ -267,7 +267,7 @@ function PhotoUpload() {
             : `Show ${childName}'s Book Preview`}
         </button>
 
-        <div className="mt-8 text-center">
+        {/* <div className="mt-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-yellow-400 text-2xl">★★★★★</span>
             <span className="font-medium">Excellent on Google</span>
@@ -275,7 +275,7 @@ function PhotoUpload() {
           <p className="text-sm text-gray-600">
             4.9 out of 5 based on 97 reviews
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
