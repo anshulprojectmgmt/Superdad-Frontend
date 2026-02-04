@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const BASE_URL = "https://storybook-render-backend.onrender.com";
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://storybook-backend-payment.onrender.com";
+// const BASE_URL = "http://localhost:3000";
 export const createRazorpayOrder = async (req_id, amount) => {
   const res = await axios.post(`${BASE_URL}/api/payment/create-order`, {
     req_id,
