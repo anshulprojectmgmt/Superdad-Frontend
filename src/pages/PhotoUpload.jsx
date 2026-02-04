@@ -4,7 +4,8 @@ import { useDropzone } from "react-dropzone";
 import useChildStore from "../store/childStore";
 import { PhotoIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-const local_server_url = "http://localhost:3000";
+// const local_server_url = "http://localhost:3000";
+const local_server_url = "https://storybook-backend-payment.onrender.com";
 // const local_server_url = "https://storybook-render-backend.onrender.com";
 
 function PhotoUpload() {

@@ -7,7 +7,8 @@ import axios from "axios";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import UnlockPaymentModal from "../components/UnlockPaymentModal";
 
-const local_server_url = "http://localhost:3000";
+// const local_server_url = "http://localhost:3000";
+const local_server_url = "https://storybook-backend-payment.onrender.com";
 // const local_server_url = "https://storybook-render-backend.onrender.com";
 //    {
 //     "_id": "68eeba12baa2e6ef48150415",
