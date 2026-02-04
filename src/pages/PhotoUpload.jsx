@@ -2,15 +2,10 @@ import { useCallback, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import useChildStore from "../store/childStore";
-import {
-  PhotoIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  BookOpenIcon,
-} from "@heroicons/react/24/outline";
+import { PhotoIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-// const local_server_url = "http://localhost:3000";
-const local_server_url = "https://storybook-render-backend.onrender.com";
+const local_server_url = "http://localhost:3000";
+// const local_server_url = "https://storybook-render-backend.onrender.com";
 
 function PhotoUpload() {
   const navigate = useNavigate();
@@ -41,7 +36,7 @@ function PhotoUpload() {
 
       const response = await axios.post(
         `${local_server_url}/api/photo/original_image`,
-        formData
+        formData,
       );
       const { file_url } = await response.data;
 
@@ -53,7 +48,7 @@ function PhotoUpload() {
           file_name: file.name,
           file_url,
           request_id,
-        }
+        },
       );
 
       const { photo_id } = await queueResponse.data;

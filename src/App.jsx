@@ -9,6 +9,8 @@ import SavePreview from "./pages/SavePreview";
 import Purchase from "./pages/Purchase";
 import SceneUploader from "./components/SceneUploader";
 import Frontpage from "./pages/Frontpage";
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
             <Route path="/save-preview" element={<SavePreview />} />
             <Route path="/purchase" element={<Purchase />} />
             <Route path="/sceneUpload" element={<SceneUploader />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>
         <Footer />

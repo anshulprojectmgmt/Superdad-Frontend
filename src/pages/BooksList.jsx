@@ -49,9 +49,9 @@ import PropTypes from "prop-types";
 //     companion: "teddy",
 //   },
 // ];
-// const server_url = "http://127.0.0.1:3000";
+const server_url = "http://127.0.0.1:3000";
 
-const server_url = "https://storybook-render-backend.onrender.com";
+// const server_url = "https://storybook-render-backend.onrender.com";
 function BooksList({ layout = "vertical" }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -115,7 +115,7 @@ function BooksList({ layout = "vertical" }) {
             key={book._id}
             className={
               layout === "horizontal"
-                ? "min-w-[320px] md:min-w-[420px] flex-shrink-0"
+                ? "min-w-auto md:min-w-auto flex-shrink-0"
                 : "transform hover:scale-105 transition-transform duration-300"
             }
           >

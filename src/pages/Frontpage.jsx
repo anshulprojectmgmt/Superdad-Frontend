@@ -109,7 +109,7 @@ function Frontpage() {
 
               <Link
                 to="/books"
-                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 hover:scale-[1.04] shadow-xl"
+                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 hover:scale-[1.04] shadow-xl sm:px-8 text-center"
               >
                 Create Your Storybook
               </Link>
@@ -117,7 +117,7 @@ function Frontpage() {
           </div>
         </div>
       </section>
-
+      {/* Listing of book cards */}
       <section className="relative py-20 px-4 overflow-hidden bg-gradient-to-b from-blue-50 via-blue-100 to-blue-50">
         {/* Pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />

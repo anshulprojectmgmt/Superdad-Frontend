@@ -1,83 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import heroImg from "../assets/magic_icon.svg";
 import useChildStore from "../store/childStore";
 import axios from "axios";
-
 const local_server_url = "http://localhost:3000";
 // const local_server_url = "https://storybook-render-backend.onrender.com";
 
 function SavePreview() {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const queryParams = new URLSearchParams(location.search);
-  const request_id = queryParams.get("request_id");
-  const book_id = queryParams.get("book_id");
-  const notify = queryParams.get("notify") === "true";
-
   const childName = useChildStore((state) => state.childName);
-  const kidName =
-    queryParams.get("name") || useChildStore((state) => state.childName);
-
   const [formData, setFormData] = useState({
     email: "",
     name: "",
   });
-
   const [showThankYou, setShowThankYou] = useState(false);
 
-  /* =====================================================
-     🚫 STEP 1: REMOVE PREVIOUS HISTORY (EMAIL MODE)
-     ===================================================== */
-  useEffect(() => {
-    if (notify) {
-      navigate(location.pathname + location.search, {
-        replace: true,
-      });
-    }
-  }, [notify, navigate, location.pathname, location.search]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const request_id = queryParams.get("request_id");
+  const kidName =
+    queryParams.get("name") || useChildStore((state) => state.childName);
+  const book_id = queryParams.get("book_id");
+  const notify = queryParams.get("notify") || false;
 
-  /* =====================================================
-     🔒 STEP 2: HARD BLOCK BROWSER BACK BUTTON
-     ===================================================== */
-  useEffect(() => {
-    if (!notify) return;
-
-    const blockBack = () => {
-      window.history.pushState(null, "", window.location.href);
-    };
-
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", blockBack);
-
-    return () => {
-      window.removeEventListener("popstate", blockBack);
-    };
-  }, [notify]);
-
-  /* =====================================================
-     📧 SEND PREVIEW LINK
-     ===================================================== */
   const sendPreviewLink = async () => {
     try {
       await axios.post(`${local_server_url}/api/photo/send_preview`, {
         email: formData.email,
         name: formData.name,
         req_id: request_id,
-        kidName,
-        book_id,
+        kidName: kidName,
+        book_id: book_id,
         notify,
       });
     } catch (error) {
-      console.error("Error sending preview link:", error);
+      console.log("Error sending preview link:", error);
+      // Handle error appropriately, e.g., show a notification or alert
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await sendPreviewLink();
 
+    await sendPreviewLink();
     if (notify) {
       setShowThankYou(true);
     } else {
@@ -87,9 +51,6 @@ function SavePreview() {
     }
   };
 
-  /* =====================================================
-     🧠 UI
-     ===================================================== */
   return (
     <>
       {!showThankYou ? (
@@ -97,8 +58,8 @@ function SavePreview() {
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h1 className="text-3xl font-bold text-center text-blue-900 mb-2">
               {notify
-                ? "Where should we send the preview link?"
-                : `Email ${childName}'s preview & see price`}
+                ? `Where to send the preview link?`
+                : `Email ${childName}'s preview link & show price of printed book`}
             </h1>
 
             <form onSubmit={handleSubmit} className="space-y-6 mt-8">
@@ -106,6 +67,9 @@ function SavePreview() {
                 <label className="block text-gray-700 text-lg mb-2">
                   Email <span className="text-red-500">*</span>
                 </label>
+                <p className="text-sm text-gray-500 mb-2">
+                  We'll email you the preview link.
+                </p>
                 <input
                   type="email"
                   required
@@ -136,9 +100,11 @@ function SavePreview() {
 
               <button
                 type="submit"
-                className="w-full bg-secondary text-white py-4 px-6 rounded-full text-xl font-semibold hover:bg-blue-600 transition"
+                className="w-full bg-secondary text-white py-4 px-6 rounded-full text-xl font-semibold hover:bg-blue-600 transition duration-300"
               >
-                {notify ? "Send Preview Link" : "Save Preview & Show Price"}
+                {notify
+                  ? "send preview notification"
+                  : "Save Preview & Show Price"}
               </button>
             </form>
 
@@ -155,7 +121,7 @@ function SavePreview() {
       ) : (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
           <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-10">
-            <div className="flex flex-col items-center mb-4">
+            <div className="flex flex-col items-center justify-center mb-4">
               <img src={heroImg} alt="logo" className="w-20 h-20 mb-3" />
               <div className="text-3xl font-extrabold text-teal-500">
                 Thank You
@@ -163,25 +129,28 @@ function SavePreview() {
             </div>
 
             <div className="text-center">
-              <p className="text-gray-600 text-lg mb-6">
-                We’ve received your request. The preview link will be emailed to
-                you shortly.
+              {/* <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
+                Thank You!
+              </h1> */}
+              <p className="text-gray-600 text-lg md:text-xl mb-6">
+                We've received your request. We'll send you the book preview
+                once it is ready.
               </p>
-
               <p className="text-gray-600 mb-6">
                 Meanwhile, you can{" "}
                 <Link
                   to="/books"
                   className="text-teal-600 underline font-medium"
                 >
-                  explore other books
-                </Link>
-                .
+                  Explore Other Books
+                </Link>{" "}
+                we have.
               </p>
 
               <div className="mt-6">
                 <Link
                   to="/"
+                  role="button"
                   className="inline-block bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-8 rounded-full shadow"
                 >
                   Go to Home

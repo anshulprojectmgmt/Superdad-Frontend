@@ -6,7 +6,7 @@ function BookCard({ book }) {
 
   const openForm = () => {
     navigate(
-      `/details?book_id=${book._id}&page_count=${book.page_count}&min_photos=${book.min_required_photos}`
+      `/details?book_id=${book._id}&page_count=${book.page_count}&min_photos=${book.min_required_photos}`,
     );
     // this route to enable when to upload a whole scene document to s3 and to db
     // navigate(
@@ -15,9 +15,9 @@ function BookCard({ book }) {
   };
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+    <div className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 h-full flex flex-col">
       {/* IMAGE */}
-      <div className="relative h-[220px] overflow-hidden">
+      <div className="relative h-[220px] overflow-hidden flex-shrink-0">
         <img
           src={book.cover_photo}
           alt={book.title}
@@ -31,16 +31,16 @@ function BookCard({ book }) {
               book.gender === "boy"
                 ? "bg-blue-500 text-white"
                 : book.gender === "girl"
-                ? "bg-pink-500 text-white"
-                : "bg-yellow-400 text-blue-900"
+                  ? "bg-pink-500 text-white"
+                  : "bg-yellow-400 text-blue-900"
             }
           `}
         >
           {book.gender === "boy"
             ? "For Boys"
             : book.gender === "girl"
-            ? "For Girls"
-            : "Unisex"}
+              ? "For Girls"
+              : "Unisex"}
         </div>
       </div>
 

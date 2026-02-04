@@ -5,7 +5,6 @@ import "react-circular-progressbar/dist/styles.css";
 import useChildStore from "../store/childStore";
 import axios from "axios";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import UnlockPaymentModal from "../components/UnlockPaymentModal";
 
 const local_server_url = "http://localhost:3000";
 // const local_server_url = "https://storybook-render-backend.onrender.com";
@@ -29,7 +28,6 @@ const local_server_url = "http://localhost:3000";
 // }
 function Preview() {
   const [searchParams] = useSearchParams();
-  const openPayment = searchParams.get("openPayment") === "true";
 
   // Get all query parameters
 
@@ -45,14 +43,6 @@ function Preview() {
   const age = searchParams.get("age");
   const birthMonth = searchParams.get("birthMonth");
   const page_count = Number(searchParams.get("page_count")) || 0;
-  const [paymentLocked, setPaymentLocked] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  const [retryAfterPayment, setRetryAfterPayment] = useState(0);
-  const [bookPrice, setBookPrice] = useState(100);
-  const isEmailPreview = searchParams.get("email") === "true";
-  const [isPaid, setIsPaid] = useState(false);
-  const [lockedPageNumber, setLockedPageNumber] = useState(null);
-  const [finalBookReady, setFinalBookReady] = useState(false);
 
   const [progress, setProgress] = useState(0);
   const [finalBook, setFinalBook] = useState(null);
@@ -84,62 +74,14 @@ function Preview() {
   const first4PagesLoaded = Math.floor(page_count / 4);
 
   // new code to print the book in correct order after all the pages and covers are generated
-  // useEffect(() => {
-  //   // Detect if this is an email preview (when ?email=true)
-  //   const isEmailPreview = searchParams.get("email") === "true";
-
-  //   // In live generation, wait for allPagesLoaded
-  //   if (!isEmailPreview && !allPagesLoaded) return;
-
-  //   let intervalId;
-
-  //   const fetchFinalBook = async () => {
-  //     try {
-  //       const res = await axios.get(
-  //         `${local_server_url}/api/photo/get_all_pages`,
-  //         {
-  //           params: { req_id: request_id },
-  //         },
-  //       );
-
-  //       const { front_cover_url, back_cover_url, pages } = res.data;
-
-  //       // Keep polling until both covers exist (for live generation)
-  //       if (!front_cover_url || !back_cover_url) {
-  //         if (!isEmailPreview) {
-  //           console.log("Covers not ready yet... retrying");
-  //         }
-  //         return; // Skip until next interval
-  //       }
-
-  //       // ✅ Maintain order: Front → Pages → Back
-  //       const ordered = [front_cover_url, ...pages, back_cover_url].filter(
-  //         Boolean,
-  //       );
-  //       setFinalBook(ordered);
-
-  //       // Stop polling when book is complete
-  //       clearInterval(intervalId);
-  //     } catch (err) {
-  //       console.error("Error fetching final book data:", err);
-  //     }
-  //   };
-
-  //   // 🟢 For live generation: poll until ready
-  //   // 🟢 For email preview: fetch once immediately
-  //   if (isEmailPreview) {
-  //     fetchFinalBook();
-  //   } else {
-  //     intervalId = setInterval(fetchFinalBook, 3000);
-  //     fetchFinalBook(); // also call immediately once
-  //   }
-
-  //   return () => clearInterval(intervalId);
-  // }, [allPagesLoaded, request_id, searchParams]);
-
   useEffect(() => {
+    // Detect if this is an email preview (when ?email=true)
+    const isEmailPreview = searchParams.get("email") === "true";
+
+    // In live generation, wait for allPagesLoaded
+    if (!isEmailPreview && !allPagesLoaded) return;
+
     let intervalId;
-    let isMounted = true;
 
     const fetchFinalBook = async () => {
       try {
@@ -150,43 +92,40 @@ function Preview() {
           },
         );
 
-        if (!isMounted) return;
-
         const { front_cover_url, back_cover_url, pages } = res.data;
 
-        // ⏳ FINAL BOOK NOT READY YET → KEEP POLLING
-        if (
-          !front_cover_url ||
-          !back_cover_url ||
-          !Array.isArray(pages) ||
-          pages.length < totalPages
-        ) {
-          return;
+        // Keep polling until both covers exist (for live generation)
+        if (!front_cover_url || !back_cover_url) {
+          if (!isEmailPreview) {
+            console.log("Covers not ready yet... retrying");
+          }
+          return; // Skip until next interval
         }
 
-        // ✅ FINAL BOOK READY
+        // ✅ Maintain order: Front → Pages → Back
         const ordered = [front_cover_url, ...pages, back_cover_url].filter(
           Boolean,
         );
-
         setFinalBook(ordered);
 
-        // 🛑 Stop polling once ready
-        if (intervalId) clearInterval(intervalId);
+        // Stop polling when book is complete
+        clearInterval(intervalId);
       } catch (err) {
         console.error("Error fetching final book data:", err);
       }
     };
 
-    // 🔁 Always poll until final book is ready
-    intervalId = setInterval(fetchFinalBook, 3000);
-    fetchFinalBook(); // immediate first attempt
+    // 🟢 For live generation: poll until ready
+    // 🟢 For email preview: fetch once immediately
+    if (isEmailPreview) {
+      fetchFinalBook();
+    } else {
+      intervalId = setInterval(fetchFinalBook, 3000);
+      fetchFinalBook(); // also call immediately once
+    }
 
-    return () => {
-      isMounted = false;
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [request_id, totalPages]);
+    return () => clearInterval(intervalId);
+  }, [allPagesLoaded, request_id, searchParams]);
 
   //to show savebtton on scrolling more than 100 in y direction
   useEffect(() => {
@@ -198,35 +137,6 @@ function Preview() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  // To fetch the book price at first load dynamically
-  useEffect(() => {
-    const fetchPrice = async () => {
-      const res = await axios.get(
-        `${local_server_url}/api/storybook/price/${book_id}`,
-      );
-      setBookPrice(res.data.price);
-    };
-
-    if (book_id) fetchPrice();
-  }, [book_id]);
-  // To make savePreiwe route work
-  useEffect(() => {
-    if (openPayment && bookPrice && !isPaid) {
-      setShowPayment(true);
-    }
-  }, [openPayment, bookPrice, isPaid]);
-  // Now Preview knows the truth about payment status
-  useEffect(() => {
-    const fetchPaymentStatus = async () => {
-      const res = await axios.get(`${local_server_url}/api/payment/status`, {
-        params: { req_id: request_id },
-      });
-
-      setIsPaid(res.data.paid);
-    };
-
-    if (request_id) fetchPaymentStatus();
-  }, [request_id]);
 
   const pollUntilDone = async (
     req_id,
@@ -307,22 +217,11 @@ function Preview() {
         }
         return { ...result, pageNumber };
       } catch (error) {
-        // 🔐 PAYMENT LOCK DETECTED
-        if (
-          error?.response?.status === 403 &&
-          error?.response?.data?.locked &&
-          !isPaid
-        ) {
-          setPaymentLocked(true);
-          setLockedPageNumber(pageNumber); // 👈 force retry same page
-          return { locked: true, pageNumber };
-        }
-
         console.error("Error fetching page data:", error);
         return null;
       }
     },
-    [request_id, childName, isPaid],
+    [request_id, childName],
   );
 
   useEffect(() => {
@@ -374,7 +273,7 @@ function Preview() {
         clearInterval(progressInterval);
       }
     };
-  }, [currentPage, fetchPageData, book_id, retryAfterPayment]);
+  }, [currentPage, fetchPageData, book_id]);
 
   const handleImageNavigation = useCallback(
     (pageIndex, direction) => {
@@ -583,30 +482,7 @@ function Preview() {
                 </div>
               ))
             : pageData.map((page, pageIndex) => {
-                if (page?.locked) {
-                  return (
-                    <div
-                      key={`locked-${pageIndex}`}
-                      className="bg-white rounded-xl shadow-lg p-8 text-center border-2 border-dashed border-gray-300"
-                    >
-                      <h2 className="text-2xl font-bold text-blue-900 mb-4">
-                        🔒 Unlock the Full Book
-                      </h2>
-
-                      <p className="text-gray-600 mb-6">
-                        You’ve seen the preview. Complete payment to unlock the
-                        remaining pages and PDF.
-                      </p>
-
-                      <button
-                        onClick={() => setShowPayment(true)}
-                        className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700"
-                      >
-                        Unlock Full Book
-                      </button>
-                    </div>
-                  );
-                }
+                if (!page) return null;
 
                 const images = page.image_urls || [];
                 const currentImageIndex = currentImageIndexes[pageIndex] || 0;
@@ -727,60 +603,30 @@ function Preview() {
       {/* Bottom action buttons */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-lg z-50">
         <div className="max-w-2xl mx-auto">
-          {!isPaid &&
-            !isEmailPreview &&
-            (!allPagesLoaded ? (
-              <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <h3 className="text-lg font-bold text-blue-900 mb-3 text-center">
-                  Don&apos;t have time to wait?
-                </h3>
-                <Link
-                  to={handleEmailPreview()}
-                  className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg text-lg font-semibold hover:bg-blue-700"
-                >
-                  Email Me The Preview Instead
-                </Link>
-              </div>
-            ) : (
+          {!allPagesLoaded ? (
+            // Show "Email me the preview instead" while pages are still loading
+            <div className="bg-white rounded-xl p-4 border border-gray-200">
+              <h3 className="text-lg font-bold text-blue-900 mb-3 text-center">
+                Don&apos;t have time to wait?
+              </h3>
               <Link
-                to={handleSavePreview()}
-                className="block w-full bg-secondary text-white text-center py-4 rounded-full text-xl font-semibold hover:bg-blue-600"
+                to={handleEmailPreview()}
+                className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300"
               >
-                Save Preview & Show Price
+                Email Me The Preview Instead
               </Link>
-            ))}
+            </div>
+          ) : (
+            // Show "Save Preview & Show Price" when all pages are loaded
+            <Link
+              to={handleSavePreview()}
+              className="block w-full bg-secondary text-white text-center py-4 rounded-full text-xl font-semibold hover:bg-blue-600 transition duration-300"
+            >
+              Save Preview & Show Price
+            </Link>
+          )}
         </div>
       </div>
-      {showPayment && (
-        <UnlockPaymentModal
-          req_id={request_id}
-          amount={bookPrice}
-          onClose={() => setShowPayment(false)}
-          onSuccess={() => {
-            setShowPayment(false);
-            setPaymentLocked(false);
-            setIsPaid(true); // ✅ IMPORTANT
-
-            // 🧹 Remove locked placeholder page
-            setPageData((prev) => prev.filter((p) => !p?.locked));
-
-            // 🔥 Resume generation immediately
-            setIsLoading(true);
-
-            if (isEmailPreview) {
-              // Resume from locked page OR continue current
-              setCurrentPage((prev) => lockedPageNumber || prev);
-            } else {
-              setRetryAfterPayment((c) => c + 1);
-            }
-
-            // ✔️ Remove openPayment param (no re-trigger)
-            const url = new URL(window.location.href);
-            url.searchParams.delete("openPayment");
-            window.history.replaceState({}, "", url.toString());
-          }}
-        />
-      )}
     </div>
   );
 }

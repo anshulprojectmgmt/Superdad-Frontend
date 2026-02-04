@@ -25,7 +25,7 @@ function Footer() {
             >
               Books for Kids
             </Link>
-            <Link
+            {/* <Link
               to="/grown-ups"
               className="block text-blue-900 hover:text-blue-700"
             >
@@ -48,7 +48,7 @@ function Footer() {
               className="block text-blue-900 hover:text-blue-700"
             >
               Refund & Cancellation Policy
-            </Link>
+            </Link> */}
           </nav>
         </div>
 
