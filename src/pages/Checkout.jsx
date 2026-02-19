@@ -3,8 +3,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import UnlockPaymentModal from "../components/UnlockPaymentModal";
 
-// const API = "https://storybook-backend-payment.onrender.com";
-const API = "http://localhost:3000";
+const API = "https://storybook-backend-payment.onrender.com";
+// const API = "http://localhost:3000";
 
 export default function Checkout() {
   const [params] = useSearchParams();
