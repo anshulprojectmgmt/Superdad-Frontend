@@ -11,6 +11,7 @@ import SceneUploader from "./components/SceneUploader";
 import Frontpage from "./pages/Frontpage";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
+import Checkout from "./pages/Checkout";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/sceneUpload" element={<SceneUploader />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </main>
         <Footer />

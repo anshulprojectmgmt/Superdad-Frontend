@@ -26,9 +26,7 @@ function ChildDetails() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setChildName(formData.name);
-    // console.log(formData);
 
-    // Create query params with all child details and book_id
     const uploadParams = new URLSearchParams({
       book_id: book_id,
       name: formData.name,
@@ -154,7 +152,7 @@ function ChildDetails() {
             type="submit"
             className="w-full bg-secondary text-white py-4 px-6 rounded-full text-lg font-semibold hover:bg-blue-600 transition duration-300 mt-8"
           >
-            Next Step → Upload Photos
+            Next Step -&gt; Upload Photos
           </button>
         </form>
       </div>

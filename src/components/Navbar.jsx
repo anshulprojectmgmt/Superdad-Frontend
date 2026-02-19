@@ -1,90 +1,81 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  const links = [
+    { to: "/books", label: "Books for Kids" },
+    { to: "/about", label: "About Us" },
+    { to: "/contact", label: "Contact" },
+  ];
 
   return (
-    <nav
-      className="bg-gradient-to-r 
-  from-[oklch(70.7%_0.165_254.624)] 
-  to-[oklch(98.5%_0_0)] 
-  shadow-lg"
-    >
+    <nav className="sticky top-0 z-50 border-b border-white/20 bg-gradient-to-r from-[#e8f4ff]/95 via-[#d6ebff]/95 to-[#f8fcff]/95 backdrop-blur-xl shadow-[0_10px_35px_rgba(30,64,175,0.12)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-24">
-          <div className="flex-shrink-0 flex items-center">
-            <Link
-              to="/"
-              className="text-3xl font-bold text-black hover:text-white transition duration-300"
-            >
+        <div className="flex justify-between items-center h-20">
+          <Link
+            to="/"
+            className="group inline-flex items-center gap-2 text-3xl font-black tracking-tight transition-transform duration-300 hover:scale-[1.02]"
+          >
+            <span className="bg-gradient-to-r from-[#0b2559] via-[#1d4ed8] to-[#0ea5e9] bg-clip-text text-transparent drop-shadow-[0_3px_12px_rgba(29,78,216,0.25)]">
               Storybook
-            </Link>
+            </span>
+            <span className="h-2.5 w-2.5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 opacity-80 group-hover:opacity-100 shadow-[0_0_14px_rgba(14,165,233,0.6)]" />
+          </Link>
+
+          <div className="hidden md:flex items-center gap-2 rounded-full bg-white/75 px-3 py-2 border border-blue-100 shadow-sm">
+            {links.map((link) => {
+              const isActive = pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`px-4 py-2 rounded-full text-base font-semibold transition-all duration-300 ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-[#12326f] hover:bg-blue-100 hover:text-blue-700"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/books"
-              className="text-black hover:text-blue-400 px-3 py-2 rounded-md text-xl font-medium transition duration-300"
-            >
-              Books for Kids
-            </Link>
-            <Link
-              to="/about"
-              className="text-black hover:text-blue-400 px-3 py-2 rounded-md text-xl font-medium transition duration-300"
-            >
-              About Us
-            </Link>
-            <Link
-              to="/contact"
-              className="text-black hover:text-blue-400 px-3 py-2 rounded-md text-xl font-medium transition duration-300"
-            >
-              Contact
-            </Link>
-          </div>
-
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-blue-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="text-[#12326f] hover:text-blue-700 rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              aria-label="Toggle menu"
             >
-              {isOpen ? (
-                <XMarkIcon className="h-6 w-6 text-black" />
-              ) : (
-                <Bars3Icon className="h-6 w-6 text-black" />
-              )}
+              {isOpen ? <XMarkIcon className="h-7 w-7" /> : <Bars3Icon className="h-7 w-7" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-[oklch(93% 0.034 272.788)] rounded-b-lg shadow-md">
-              <Link
-                to="/books"
-                className="text-black hover:bg-blue-400 block px-3 py-2 rounded-md text-base font-medium transition duration-300"
-                onClick={() => setIsOpen(false)}
-              >
-                Books for Kids
-              </Link>
-              <Link
-                to="/about"
-                className="text-black hover:bg-blue-400 block px-3 py-2 rounded-md text-base font-medium transition duration-300"
-                onClick={() => setIsOpen(false)}
-              >
-                About Us
-              </Link>
-              <Link
-                to="/contact"
-                className="text-black hover:bg-blue-400 block px-3 py-2 rounded-md text-base font-medium transition duration-300"
-                onClick={() => setIsOpen(false)}
-              >
-                Contact
-              </Link>
+          <div className="md:hidden pb-4">
+            <div className="px-2 py-2 space-y-1 bg-white/90 rounded-2xl border border-blue-100 shadow-lg">
+              {links.map((link) => {
+                const isActive = pathname === link.to;
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`block px-4 py-2.5 rounded-xl text-base font-semibold transition-colors ${
+                      isActive
+                        ? "bg-blue-600 text-white"
+                        : "text-[#12326f] hover:bg-blue-100 hover:text-blue-700"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

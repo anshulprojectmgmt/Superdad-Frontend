@@ -4,8 +4,8 @@ import { useDropzone } from "react-dropzone";
 import useChildStore from "../store/childStore";
 import { PhotoIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-// const local_server_url = "http://localhost:3000";
-const local_server_url = "https://storybook-backend-payment.onrender.com";
+const local_server_url = "http://localhost:3000";
+// const local_server_url = "https://storybook-backend-payment.onrender.com";
 // const local_server_url = "https://storybook-render-backend.onrender.com";
 
 function PhotoUpload() {
@@ -118,72 +118,30 @@ function PhotoUpload() {
     !isUploading;
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6">
+    <div className="max-w-5xl mx-auto mt-10 p-6">
       <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
         <div className="flex items-center justify-center mb-6">
           <BookOpenIcon className="h-12 w-12 text-primary" />
         </div>
-        <h2 className="text-3xl font-bold text-center mb-2 text-gray-800">
+        <h2 className="text-xl font-bold text-center mb-2 text-gray-800">
           {childName}'s Story Photos
         </h2>
         <p className="text-center text-lg mb-8 text-gray-600">
           Upload 2 to 4 photos of {childName}
         </p>
 
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-50 rounded-xl p-6">
-            <h3 className="font-semibold mb-4 text-gray-800">
-              Photo Guidelines
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <CheckCircleIcon className="h-6 w-6 text-green-500" />
-                <span>Solo Photos Only</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircleIcon className="h-6 w-6 text-green-500" />
-                <span>Front Facing & Smiling</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <XCircleIcon className="h-6 w-6 text-red-500" />
-                <span>No Sunglasses or Caps</span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            {...getRootProps()}
-            className={`border-3 border-dashed border-blue-200 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 transition duration-300 relative bg-[radial-gradient(#e0e7ff_1px,transparent_1px)] [background-size:16px_16px] ${
-              isDragActive ? "border-blue-400 bg-blue-50" : ""
-            }`}
-          >
-            <input {...getInputProps()} />
-            <div className="space-y-4">
-              <PhotoIcon className="h-12 w-12 mx-auto text-blue-400" />
-              <p className="text-lg font-medium text-gray-700">
-                {isDragActive
-                  ? "Drop your photos here"
-                  : "Drop your photos here"}
-              </p>
-              <p className="text-sm text-gray-500">or click to select files</p>
-              <p className="text-xs text-gray-400">
-                Minimum {Number(min_photos)} photos required
-              </p>
-            </div>
-          </div>
-        </div> */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6 mb-8 items-stretch">
           {/* SINGLE GUIDELINE IMAGE */}
-          <div className="bg-blue-50 rounded-xl p-6 flex flex-col">
-            <h3 className="font-semibold mb-4 text-gray-800">
+          <div className="bg-blue-50 rounded-xl p-2 sm:p-3 flex flex-col">
+            <h3 className="font-semibold mb-3 text-gray-800 text-center text-lg">
               Photo Guidelines
             </h3>
 
-            <div className="relative w-full overflow-hidden rounded-lg border border-blue-200 bg-white">
+            <div className="relative w-full overflow-hidden rounded-lg border border-blue-200 bg-white shadow-sm">
               <img
                 src="/guidelines/instruction.jpg"
                 alt="Photo upload guidelines"
-                className="w-full h-auto object-contain"
+                className="w-full h-fit md:h-fit object-contain"
               />
             </div>
           </div>
@@ -227,7 +185,7 @@ function PhotoUpload() {
                 >
                   <span>{file.name}</span>
                   {isUploading && index >= uploadStatus.length && (
-                    <span className="text-blue-500">⏳</span>
+                    <span className="text-blue-500">Uploading...</span>
                   )}
                   {uploadStatus[index] && (
                     <span
@@ -237,7 +195,7 @@ function PhotoUpload() {
                           : "text-red-500"
                       }
                     >
-                      {uploadStatus[index].success ? "✓" : "✗"}
+                      {uploadStatus[index].success ? "Success" : "Failed"}
                     </span>
                   )}
                 </div>
@@ -262,16 +220,6 @@ function PhotoUpload() {
             ? "Uploading Photos..."
             : `Show ${childName}'s Book Preview`}
         </button>
-
-        {/* <div className="mt-8 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-yellow-400 text-2xl">★★★★★</span>
-            <span className="font-medium">Excellent on Google</span>
-          </div>
-          <p className="text-sm text-gray-600">
-            4.9 out of 5 based on 97 reviews
-          </p>
-        </div> */}
       </div>
     </div>
   );

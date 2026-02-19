@@ -7,8 +7,8 @@ import axios from "axios";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import UnlockPaymentModal from "../components/UnlockPaymentModal";
 
-// const local_server_url = "http://localhost:3000";
-const local_server_url = "https://storybook-backend-payment.onrender.com";
+const local_server_url = "http://localhost:3000";
+// const local_server_url = "https://storybook-backend-payment.onrender.com";
 // const local_server_url = "https://storybook-render-backend.onrender.com";
 //    {
 //     "_id": "68eeba12baa2e6ef48150415",
@@ -548,8 +548,8 @@ function Preview() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 pt-6 pb-24">
-        <h1 className="text-4xl md:text-5xl font-bold text-center text-blue-900 mb-6">
-          {childName}&apos;s Book Preview
+        <h1 className="text-4xl font-bold text-center">
+          {childName ? `${childName}'s Book Preview` : "Book Preview"}
         </h1>
 
         <div className="space-y-12">
@@ -599,12 +599,18 @@ function Preview() {
                         remaining pages and PDF.
                       </p>
 
-                      <button
+                      {/* <button
                         onClick={() => setShowPayment(true)}
                         className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700"
                       >
                         Unlock Full Book
-                      </button>
+                      </button> */}
+                      <Link
+                        to={`/checkout?request_id=${request_id}&book_id=${book_id}&book_Price=${bookPrice}`}
+                        className="bg-blue-600 text-white px-8 py-4 rounded-full"
+                      >
+                        Proceed to Checkout
+                      </Link>
                     </div>
                   );
                 }
