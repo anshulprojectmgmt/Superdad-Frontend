@@ -19,6 +19,7 @@ function BooksList({ layout = "vertical" }) {
     try {
       const res = await axios.get(`${server_url}/api/storybook`);
       setBooks(res.data);
+      console.log(res.data);
     } catch (error) {
       console.log("Error fetching books:", error);
     } finally {

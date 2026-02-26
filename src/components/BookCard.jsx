@@ -6,7 +6,9 @@ function BookCard({ book }) {
 
   const openForm = () => {
     navigate(
-      `/details?book_id=${book._id}&page_count=${book.page_count}&min_photos=${book.min_required_photos}`,
+      `/details?book_id=${book._id}&page_count=${book.page_count}&min_photos=${book.min_required_photos}&age_group=${
+        book.age_group
+      }&gender=${book.gender}`,
     );
   };
 
@@ -38,7 +40,9 @@ function BookCard({ book }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/45 via-transparent to-transparent" />
 
-        <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow ${genderBadgeClass}`}>
+        <div
+          className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow ${genderBadgeClass}`}
+        >
           {genderLabel}
         </div>
       </div>
@@ -49,9 +53,13 @@ function BookCard({ book }) {
           Ages {book.age_group}
         </span>
 
-        <h3 className="text-xl font-black text-slate-800 mb-2 line-clamp-2">{book.title}</h3>
+        <h3 className="text-xl font-black text-slate-800 mb-2 line-clamp-2">
+          {book.title}
+        </h3>
 
-        <p className="text-sm text-slate-600 mb-5 line-clamp-3">{book.description}</p>
+        <p className="text-sm text-slate-600 mb-5 line-clamp-3">
+          {book.description}
+        </p>
 
         <div className="mt-auto pt-3 border-t border-slate-100">
           <button
